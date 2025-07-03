@@ -1,0 +1,63 @@
+# SMART DATA ANALYZER PROJECT
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+print("==== SMART DATA ANALYZER ====")
+
+# Step 1: Load the CSV File
+file_path = input("Enter the CSV file path (example: data.csv): ")
+try:
+    df = pd.read_csv(file_path)
+    print("\n✅ File loaded successfully!\n")
+except Exception as e:
+    print("❌ Error loading file:", e)
+    exit()
+
+# Step 2: Display Basic Information
+print("🔍 DATA SUMMARY")
+print("Shape of Data:", df.shape)
+print("\nColumn Types:\n", df.dtypes)
+print("\nMissing Values:\n", df.isnull().sum())
+print("\nFirst 5 Rows:\n", df.head())
+print("\nStatistical Description:\n", df.describe(include='all'))
+
+# Step 3: Data Cleaning
+df_clean = df.dropna(thresh=len(df.columns) - 1)  # Drop rows with too many nulls
+df_clean = df_clean.fillna(df_clean.mean(numeric_only=True))  # Fill others with mean
+print("\n✅ Data cleaned.")
+
+# Step 4: Correlation Heatmap
+print("\n📊 Correlation Heatmap")
+plt.figure(figsize=(10, 6))
+sns.heatmap(df_clean.corr(numeric_only=True), annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Step 5: Bar Chart for First Categorical Column
+cat_columns = df_clean.select_dtypes(include='object').columns
+if len(cat_columns) > 0:
+    cat_col = cat_columns[0]
+    print(f"\n📊 Bar Chart for Categorical Column: {cat_col}")
+    df_clean[cat_col].value_counts().plot(kind='bar', color='orange')
+    plt.title(f"Bar Chart of {cat_col}")
+    plt.xlabel(cat_col)
+    plt.ylabel("Count")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+else:
+    print("\nℹ No categorical columns found for bar chart.")
+
+# Step 6: Optional ML Prediction
+predict = input("\nDo you want to perform prediction using Linear Regression? (yes/no): ").lower()
+
+if predict == "yes":
+    target_column = input("Enter the name of the target column to predict: ")
+
+    if target_column not in df_clean.columns:
+        print("❌ Target co")
